@@ -56,7 +56,7 @@ int main()
       }
 
       // copy the data into the buffer
-      xt::view(buffer, xt::all(), a.idx.e2.value(), a.idx.e1.value(), xt::all()) = xt::xarray<std::complex<float>>(a.data);
+      xt::view(buffer, xt::all(), a.idx.kspace_encode_step2.value(), a.idx.kspace_encode_step1.value(), xt::all()) = xt::xarray<std::complex<float>>(a.data);
 
       // if this is the last line, we need to write the buffer
       if (std::find(a.flags.begin(), a.flags.end(), mrd::AcquisitionFlags::kLastInEncodeStep1) != a.flags.end())
