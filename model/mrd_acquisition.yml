@@ -1,48 +1,37 @@
 AcquisitionFlags: !enum
+  base: uint64
   values:
-    firstInEncodeStep1: 1
-    lastInEncodeStep1: 2
-    firstInEncodeStep2: 3
-    lastInEncodeStep2: 4
-    firstInAverage: 5
-    lastInAverage: 6
-    firstInSlice: 7
-    lastInSlice: 8
-    firstInContrast: 9
-    lastInContrast: 10
-    firstInPhase: 11
-    lastInPhase: 12
-    firstInRepetition: 13
-    lastInRepetition: 14
-    firstInSet: 15
-    lastInSet: 16
-    firstInSegment: 17
-    lastInSegment: 18
-    isNoiseMeasurement: 19
-    isParallelCalibration: 20
-    isParallelCalibrationAndImaging: 21
-    isReverse: 22
-    isNavigationData: 23
-    isPhasecorrData: 24
-    lastInMeasurement: 25
-    isHpfeedbackData: 26
-    isDummyscanData: 27
-    isRtfeedbackData: 28
-    isSurfacecoilcorrectionscanData: 29
-    isPhaseStabilizationReference: 30
-    isPhaseStabilization: 31
-    compression1: 53
-    compression2: 54
-    compression3: 55
-    compression4: 56
-    user1: 57
-    user2: 58
-    user3: 59
-    user4: 60
-    user5: 61
-    user6: 62
-    user7: 63
-    user8: 64
+    firstInEncodeStep1: 0x1
+    lastInEncodeStep1: 0x2
+    firstInEncodeStep2: 0x4
+    lastInEncodeStep2: 0x8
+    firstInAverage: 0x10
+    lastInAverage: 0x20
+    firstInSlice: 0x40
+    lastInSlice: 0x80
+    firstInContrast: 0x100
+    lastInContrast: 0x200
+    firstInPhase: 0x400
+    lastInPhase: 0x800
+    firstInRepetition: 0x1000
+    lastInRepetition: 0x2000
+    firstInSet: 0x4000
+    lastInSet: 0x8000
+    firstInSegment: 0x10000
+    lastInSegment: 0x20000
+    isNoiseMeasurement: 0x40000
+    isParallelCalibration: 0x80000
+    isParallelCalibrationAndImaging: 0x100000
+    isReverse: 0x200000
+    isNavigationData: 0x400000
+    isPhasecorrData: 0x800000
+    lastInMeasurement: 0x1000000
+    isHpfeedbackData: 0x2000000
+    isDummyscanData: 0x4000000
+    isRtfeedbackData: 0x8000000
+    isSurfacecoilcorrectionscanData: 0x10000000
+    isPhaseStabilizationReference: 0x20000000
+    isPhaseStabilization: 0x40000000
 
 EncodingCounters: !record
   fields:
@@ -72,8 +61,7 @@ TrajectoryData: !array
 
 Acquisition: !record
   fields:
-    flags: !vector
-      items: AcquisitionFlags
+    flags: uint64
     idx: EncodingCounters
     measurementUid: uint # remove?
     scanCounter: uint?

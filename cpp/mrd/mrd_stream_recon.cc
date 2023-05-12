@@ -31,7 +31,7 @@ int main()
     {
       auto a = std::get<mrd::Acquisition>(v);
       // if this is the first line, we need to allocate the buffer
-      if (std::find(a.flags.begin(), a.flags.end(), mrd::AcquisitionFlags::kFirstInEncodeStep1) != a.flags.end())
+      if (a.flags & static_cast<uint64_t>(mrd::AcquisitionFlags::kFirstInEncodeStep1))
       {
         std::array<size_t, 4> shape = {a.data.shape()[0], h.encoding[0].recon_space.matrix_size.z, h.encoding[0].recon_space.matrix_size.y, h.encoding[0].recon_space.matrix_size.x};
         buffer = xt::zeros<std::complex<float>>(shape);
@@ -59,7 +59,7 @@ int main()
       xt::view(buffer, xt::all(), a.idx.kspace_encode_step2.value(), a.idx.kspace_encode_step1.value(), xt::all()) = xt::xarray<std::complex<float>>(a.data);
 
       // if this is the last line, we need to write the buffer
-      if (std::find(a.flags.begin(), a.flags.end(), mrd::AcquisitionFlags::kLastInEncodeStep1) != a.flags.end())
+      if (a.flags & static_cast<uint64_t>(mrd::AcquisitionFlags::kLastInEncodeStep1))
       {
         buffer = fftshift(buffer);
         for (unsigned int c = 0; c < buffer.shape()[0]; c++)

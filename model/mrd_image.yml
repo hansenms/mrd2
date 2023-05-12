@@ -1,26 +1,19 @@
 ImageFlags: !enum
+  base: uint64
   values:
-    isNavigationData: 1
-    firstInAverage: 5
-    lastInAverage: 6
-    firstInSlice: 7
-    lastInSlice: 8
-    firstInContrast: 9
-    lastInContrast: 10
-    firstInPhase: 11
-    lastInPhase: 12
-    firstInRepetition: 13
-    lastInRepetition: 14
-    firstInSet: 15
-    lastInSet: 16
-    user1: 57
-    user2: 58
-    user3: 59
-    user4: 60
-    user5: 61
-    user6: 62
-    user7: 63
-    user8: 64
+    isNavigationData: 0x1
+    firstInAverage: 0x2
+    lastInAverage: 0x4
+    firstInSlice: 0x8
+    lastInSlice: 0x10
+    firstInContrast: 0x20
+    lastInContrast: 0x40
+    firstInPhase: 0x80
+    lastInPhase: 0x100
+    firstInRepetition: 0x200
+    lastInRepetition: 0x400
+    firstInSet: 0x800
+    lastInSet: 0x1000
 
 ImageType: !enum
   values:
@@ -45,8 +38,7 @@ ImageMetaData: !record
 
 Image<T>: !record
   fields:
-    flags: !vector
-      items: ImageFlags
+    flags: uint64
     measurementUid: uint #Remove?
     fieldOfView: !array
       items: float

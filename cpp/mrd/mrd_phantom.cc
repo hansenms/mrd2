@@ -206,11 +206,11 @@ int main(int argc, char **argv)
       Acquisition a;
       if (line == 0)
       {
-        a.flags.push_back(AcquisitionFlags::kFirstInEncodeStep1);
+        a.flags |= static_cast<uint64_t>(AcquisitionFlags::kFirstInEncodeStep1);
       }
       if (line == matrix - 1)
       {
-        a.flags.push_back(AcquisitionFlags::kLastInEncodeStep1);
+        a.flags |= static_cast<uint64_t>(AcquisitionFlags::kLastInEncodeStep1);
       }
       a.idx.kspace_encode_step1 = line;
       a.idx.kspace_encode_step2 = 0;
