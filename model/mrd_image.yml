@@ -2,18 +2,18 @@ ImageFlags: !enum
   base: uint64
   values:
     isNavigationData: 0x1
-    firstInAverage: 0x2
-    lastInAverage: 0x4
-    firstInSlice: 0x8
-    lastInSlice: 0x10
-    firstInContrast: 0x20
-    lastInContrast: 0x40
-    firstInPhase: 0x80
-    lastInPhase: 0x100
-    firstInRepetition: 0x200
-    lastInRepetition: 0x400
-    firstInSet: 0x800
-    lastInSet: 0x1000
+    firstInAverage: 0x10
+    lastInAverage: 0x20
+    firstInSlice: 0x40
+    lastInSlice: 0x80
+    firstInContrast: 0x100
+    lastInContrast: 0x200
+    firstInPhase: 0x400
+    lastInPhase: 0x800
+    firstInRepetition: 0x1000
+    lastInRepetition: 0x2000
+    firstInSet: 0x4000
+    lastInSet: 0x8000
 
 ImageType: !enum
   values:
