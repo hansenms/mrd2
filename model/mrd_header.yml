@@ -16,7 +16,7 @@ SubjectInformationType: !record
 StudyInformationType: !record
   fields:
     studyDate: date?
-    studyTime: datetime?
+    studyTime: time?
     studyID: string?
     accessionNumber: long?
     referringPhysicianName: string?
@@ -54,7 +54,7 @@ MeasurementInformationType: !record
   fields:
     measurementID: string?
     seriesDate: date?
-    seriesTime: datetime?
+    seriesTime: time?
     patientPosition: PatientPosition
     relativeTablePosition: ThreeDimensionalFloat?
     initialSeriesNumber: long?

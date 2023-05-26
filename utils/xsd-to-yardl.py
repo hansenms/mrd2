@@ -67,7 +67,7 @@ def render_record(element: xmlschema.XsdElement, records: Dict[str, str] = {}):
             elif field.type.local_name == "date":
                 outp.write("    " +  to_camel_case(field.local_name) + ": date" + is_optional + "\n")
             elif field.type.local_name == "time":
-                outp.write("    " +  to_camel_case(field.local_name) + ": datetime" + is_optional + "\n")
+                outp.write("    " +  to_camel_case(field.local_name) + ": time" + is_optional + "\n")
             elif field.type.local_name == "base64Binary":
                 outp.write("    " +  to_camel_case(field.local_name) + ": string" + is_optional + "\n")
             else:
