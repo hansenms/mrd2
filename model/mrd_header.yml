@@ -48,7 +48,7 @@ MeasurementDependencyType: !record
 
 ReferencedImageSequenceType: !record
   fields:
-    referencedSOPInstanceUID: string?
+    referencedSOPInstanceUID: string*
 
 MeasurementInformationType: !record
   fields:
@@ -192,7 +192,7 @@ InterleavingDimension: !enum
 
 MultibandSpacingType: !record
   fields:
-    dZ: float
+    dZ: float*
 
 Calibration: !enum
     values:
@@ -256,12 +256,12 @@ DiffusionType: !record
 
 SequenceParametersType: !record
   fields:
-    tR: float?
-    tE: float?
-    tI: float?
-    flipAngledeg: float?
+    tR: float*
+    tE: float*
+    tI: float*
+    flipAngledeg: float*
     sequencetype: string?
-    echospacing: float?
+    echospacing: float*
     diffusionDimension: DiffusionDimension?
     diffusion: !vector
       items: DiffusionType

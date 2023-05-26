@@ -50,6 +50,9 @@ def render_record(element: xmlschema.XsdElement, records: Dict[str, str] = {}):
             else:
                 outp.write("    " + to_camel_case(field.local_name) + ": " + to_pascal_case(field.type.local_name) + is_optional + "\n")
         elif field.type.is_atomic() and not field.type.is_restriction():
+            if field.max_occurs is None or field.max_occurs > 1:
+                is_optional = "*"
+
             if field.type.local_name == "long":
                 outp.write("    " +  to_camel_case(field.local_name) + ": long" + is_optional + "\n")
             elif field.type.local_name == "unsignedShort":
