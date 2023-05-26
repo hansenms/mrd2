@@ -1,5 +1,7 @@
 include_directories(../)
 
+find_package(ISMRMRD 1.13.4 REQUIRED)
+
 add_executable(
   mrd_phantom
   mrd_phantom.cc
@@ -37,8 +39,19 @@ add_executable(
   mrd_stream_recon.cc
 )
 
-  target_link_libraries(
+target_link_libraries(
     mrd_stream_recon
     fftw3f
     mrd_generated
+)
+
+add_executable(
+  ismrmrd_to_mrd
+  ismrmrd_to_mrd.cc
+)
+
+target_link_libraries(
+  ismrmrd_to_mrd
+  mrd_generated
+  ISMRMRD::ISMRMRD
 )
