@@ -1023,51 +1023,6 @@ mrd::EncodingCounters convert(ISMRMRD::EncodingCounters &e)
 
     return encodingCounters;
 }
-
-// Convert ISMRMRD::Acquisition to mrd::Acquisition
-// Acquisition: !record
-//   fields:
-//     flags: uint64
-//     idx: EncodingCounters
-//     measurementUid: uint # remove?
-//     scanCounter: uint?
-//     acquisitionTimeStamp: uint?
-//     physiologyTimeStamp: !vector
-//       items: uint
-//     channelOrder: !vector
-//       items: uint
-//     discardPre: uint?
-//     discardPost: uint?
-//     centerSample: uint?
-//     encodingSpaceRef: uint?
-//     sampleTimeUs: float?
-//     position: !array
-//       items: float
-//       dimensions: [3]
-//     readDir: !array
-//       items: float
-//       dimensions: [3]
-//     phaseDir: !array
-//       items: float
-//       dimensions: [3]
-//     sliceDir: !array
-//       items: float
-//       dimensions: [3]
-//     patientTablePosition: !array
-//       items: float
-//       dimensions: [3]
-//     userInt: !vector
-//       items: int
-//     userFloat: !vector
-//       items: float
-//     data: AcquisitionData
-//     trajectory: TrajectoryData
-//   computedFields:
-//     coils: size(data, "coils")
-//     samples: size(data, "samples")
-//     activeChannels: size(channelOrder)
-//     trajectoryDimensions: size(trajectory, "basis")
-//     tracjectorySamples: size(trajectory, "samples")
 mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
 {
     mrd::Acquisition acquisition;
@@ -1129,7 +1084,18 @@ mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
 
     acquisition.data = xt::view(data, xt::all(), xt::all());
 
-    // TODO: Trajectory data
+    if (acq.trajectory_dimensions() > 0)
+    {
+        mrd::TrajectoryData trajectory({acq.trajectory_dimensions(), acq.number_of_samples()});
+        for (uint16_t d = 0; d < acq.trajectory_dimensions(); d++)
+        {
+            for (uint16_t s = 0; s < acq.number_of_samples(); s++)
+            {
+                trajectory(d, s) = acq.traj(s, d);
+            }
+        }
+        acquisition.trajectory = xt::view(trajectory, xt::all(), xt::all());
+    }
 
     return acquisition;
 }
