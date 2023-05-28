@@ -138,7 +138,6 @@ mrd::StudyInformationType convert(ISMRMRD::StudyInformation &studyInformation)
     return s;
 }
 
-// Convert string to PatientPosition
 mrd::PatientPosition patient_position_from_string(std::string &s)
 {
     if (s == "HFP")
@@ -346,13 +345,6 @@ mrd::ExperimentalConditionsType convert(ISMRMRD::ExperimentalConditions &e)
     return ec;
 }
 
-// convert ISMRMRD::MatrixSize to mrd::MatrixSizeType
-// Schema:
-// MatrixSizeType: !record
-//   fields:
-//     x: uint
-//     y: uint
-//     z: uint
 mrd::MatrixSizeType convert(ISMRMRD::MatrixSize &m)
 {
     mrd::MatrixSizeType matrixSize;
@@ -362,13 +354,6 @@ mrd::MatrixSizeType convert(ISMRMRD::MatrixSize &m)
     return matrixSize;
 }
 
-// convert ISMRMRD::FieldOfView to mrd::FieldOfViewType
-// Schema:
-// FieldOfViewmm: !record
-//   fields:
-//     x: float
-//     y: float
-//     z: float
 mrd::FieldOfViewmm convert(ISMRMRD::FieldOfView_mm &f)
 {
     mrd::FieldOfViewmm fieldOfView;
@@ -378,12 +363,6 @@ mrd::FieldOfViewmm convert(ISMRMRD::FieldOfView_mm &f)
     return fieldOfView;
 }
 
-// Convert ISMRMRD::EncodingSpace to mrd::EncodingSpaceType
-// Schema:
-// EncodingSpaceType: !record
-//   fields:
-//     matrixSize: MatrixSizeType
-//     fieldOfViewmm: FieldOfViewmm
 mrd::EncodingSpaceType convert(ISMRMRD::EncodingSpace &e)
 {
     mrd::EncodingSpaceType encodingSpace;
@@ -392,13 +371,6 @@ mrd::EncodingSpaceType convert(ISMRMRD::EncodingSpace &e)
     return encodingSpace;
 }
 
-// Converts ISMRMRD::Limit to mrd::LimitType
-// Schema:
-// LimitType: !record
-//   fields:
-//     minimum: uint
-//     maximum: uint
-//     center: uint
 mrd::LimitType convert(ISMRMRD::Limit &l)
 {
     mrd::LimitType limit;
@@ -408,28 +380,6 @@ mrd::LimitType convert(ISMRMRD::Limit &l)
     return limit;
 }
 
-// Comvert ISMRMRD::EncodingLimits to mrd::EncodingLimitsType
-// Schema:
-// EncodingLimitsType: !record
-//   fields:
-//     kspaceencodingstep0: LimitType?
-//     kspaceencodingstep1: LimitType?
-//     kspaceencodingstep2: LimitType?
-//     average: LimitType?
-//     slice: LimitType?
-//     contrast: LimitType?
-//     phase: LimitType?
-//     repetition: LimitType?
-//     set: LimitType?
-//     segment: LimitType?
-//     user0: LimitType?
-//     user1: LimitType?
-//     user2: LimitType?
-//     user3: LimitType?
-//     user4: LimitType?
-//     user5: LimitType?
-//     user6: LimitType?
-//     user7: LimitType?
 mrd::EncodingLimitsType convert(ISMRMRD::EncodingLimits &e)
 {
     mrd::EncodingLimitsType encodingLimits;
@@ -527,11 +477,6 @@ mrd::EncodingLimitsType convert(ISMRMRD::EncodingLimits &e)
     return encodingLimits;
 }
 
-// Convert ISMRMRD::UserParameterLong to mrd::UserParameterLongType
-// UserParameterLongType: !record
-//   fields:
-//     name: string
-//     value: long
 mrd::UserParameterLongType convert(ISMRMRD::UserParameterLong &u)
 {
     mrd::UserParameterLongType userParameterLong;
@@ -540,11 +485,6 @@ mrd::UserParameterLongType convert(ISMRMRD::UserParameterLong &u)
     return userParameterLong;
 }
 
-// Convert ISMRMRD::UserParameterDouble to mrd::UserParameterDoubleType
-// UserParameterDoubleType: !record
-//   fields:
-//     name: string
-//     value: double
 mrd::UserParameterDoubleType convert(ISMRMRD::UserParameterDouble &u)
 {
     mrd::UserParameterDoubleType userParameterDouble;
@@ -553,11 +493,6 @@ mrd::UserParameterDoubleType convert(ISMRMRD::UserParameterDouble &u)
     return userParameterDouble;
 }
 
-// Convert ISMRMRD::UserParameterString to mrd::UserParameterStringType
-// UserParameterStringType: !record
-//   fields:
-//     name: string
-//     value: string
 mrd::UserParameterStringType convert(ISMRMRD::UserParameterString &u)
 {
     mrd::UserParameterStringType userParameterString;
@@ -566,17 +501,6 @@ mrd::UserParameterStringType convert(ISMRMRD::UserParameterString &u)
     return userParameterString;
 }
 
-// Convert ISMRMRD::TrajectoryDescription to mrd::TrajectoryDescriptionType
-// TrajectoryDescriptionType: !record
-//   fields:
-//     identifier: string
-//     userParameterLong: !vector
-//       items: UserParameterLongType
-//     userParameterDouble: !vector
-//       items: UserParameterDoubleType
-//     userParameterString: !vector
-//       items: UserParameterStringType
-//     comment: string?
 mrd::TrajectoryDescriptionType convert(ISMRMRD::TrajectoryDescription &t)
 {
     mrd::TrajectoryDescriptionType trajectoryDescription;
@@ -605,11 +529,6 @@ mrd::TrajectoryDescriptionType convert(ISMRMRD::TrajectoryDescription &t)
     return trajectoryDescription;
 }
 
-// Convert ISMRMRD::AccellerationFactor to mrd::AccelerationFactorType
-// AccelerationFactorType: !record
-//   fields:
-//     kspaceencodingstep1: uint
-//     kspaceencodingstep2: uint
 mrd::AccelerationFactorType convert(ISMRMRD::AccelerationFactor &a)
 {
     mrd::AccelerationFactorType accelerationFactor;
@@ -618,14 +537,6 @@ mrd::AccelerationFactorType convert(ISMRMRD::AccelerationFactor &a)
     return accelerationFactor;
 }
 
-// Convert ISMRMRD::CalibrationMode to mrd::CalibrationModeType
-// CalibrationMode: !enum
-//     values:
-//     - embedded
-//     - interleaved
-//     - separate
-//     - external
-//     - other
 mrd::CalibrationMode calibration_mode_from_string(std::string &m)
 {
     if (m == "embedded")
@@ -654,14 +565,6 @@ mrd::CalibrationMode calibration_mode_from_string(std::string &m)
     }
 }
 
-// Convert ISMRMRD::InterleavingDimension to mrd::InterleavingDimensionType
-// InterleavingDimension: !enum
-//     values:
-//     - phase
-//     - repetition
-//     - contrast
-//     - average
-//     - other
 mrd::InterleavingDimension interleaving_dimension_from_string(std::string &s)
 {
     if (s == "phase")
@@ -690,10 +593,6 @@ mrd::InterleavingDimension interleaving_dimension_from_string(std::string &s)
     }
 }
 
-// Convert ISMRMRD::MultibandSpacing to mrd::MultibandSpacingType
-// MultibandSpacingType: !record
-//   fields:
-//     dZ: float
 mrd::MultibandSpacingType convert(ISMRMRD::MultibandSpacing &m)
 {
     mrd::MultibandSpacingType multibandSpacing;
@@ -704,12 +603,6 @@ mrd::MultibandSpacingType convert(ISMRMRD::MultibandSpacing &m)
     return multibandSpacing;
 }
 
-// Calibration from string
-// Calibration: !enum
-//     values:
-//     - separable2D
-//     - full3D
-//     - other
 mrd::Calibration convert(ISMRMRD::MultibandCalibrationType &m)
 {
     if (m == ISMRMRD::MultibandCalibrationType::SEPARABLE2D)
@@ -730,15 +623,6 @@ mrd::Calibration convert(ISMRMRD::MultibandCalibrationType &m)
     }
 }
 
-// Convert ISMRMRD::MultiBand to mrd::MultibandType
-// MultibandType: !record
-//   fields:
-//     spacing: !vector
-//       items: MultibandSpacingType
-//     deltaKz: float
-//     multibandfactor: uint
-//     calibration: Calibration
-//     calibrationencoding: uint64
 mrd::MultibandType convert(ISMRMRD::Multiband &m)
 {
     mrd::MultibandType multiband;
@@ -753,13 +637,6 @@ mrd::MultibandType convert(ISMRMRD::Multiband &m)
     return multiband;
 }
 
-// Convert ISMRMRD::ParallelImaging to mrd::ParallelImagingType
-// ParallelImagingType: !record
-//   fields:
-//     accelerationFactor: AccelerationFactorType
-//     calibrationMode: CalibrationMode?
-//     interleavingDimension: InterleavingDimension?
-//     multiband: MultibandType?
 mrd::ParallelImagingType convert(ISMRMRD::ParallelImaging &p)
 {
     mrd::ParallelImagingType parallelImaging;
@@ -779,17 +656,6 @@ mrd::ParallelImagingType convert(ISMRMRD::ParallelImaging &p)
     return parallelImaging;
 }
 
-// Convert ISMRMRD::Encoding to mrd::EncodingType
-// Schema:
-// EncodingType: !record
-//   fields:
-//     encodedSpace: EncodingSpaceType
-//     reconSpace: EncodingSpaceType
-//     encodingLimits: EncodingLimitsType
-//     trajectory: Trajectory
-//     trajectoryDescription: TrajectoryDescriptionType?
-//     parallelImaging: ParallelImagingType?
-//     echoTrainLength: long?
 mrd::EncodingType convert(ISMRMRD::Encoding &e)
 {
     mrd::EncodingType encoding;
@@ -846,6 +712,236 @@ mrd::EncodingType convert(ISMRMRD::Encoding &e)
     return encoding;
 }
 
+mrd::DiffusionDimension convert(ISMRMRD::DiffusionDimension &diffusionDimension)
+{
+    if (diffusionDimension == ISMRMRD::DiffusionDimension::AVERAGE)
+    {
+        return mrd::DiffusionDimension::kAverage;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::CONTRAST)
+    {
+        return mrd::DiffusionDimension::kContrast;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::PHASE)
+    {
+        return mrd::DiffusionDimension::kPhase;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::REPETITION)
+    {
+        return mrd::DiffusionDimension::kRepetition;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::SET)
+    {
+        return mrd::DiffusionDimension::kSet;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::SEGMENT)
+    {
+        return mrd::DiffusionDimension::kSegment;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_0)
+    {
+        return mrd::DiffusionDimension::kUser0;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_1)
+    {
+        return mrd::DiffusionDimension::kUser1;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_2)
+    {
+        return mrd::DiffusionDimension::kUser2;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_3)
+    {
+        return mrd::DiffusionDimension::kUser3;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_4)
+    {
+        return mrd::DiffusionDimension::kUser4;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_5)
+    {
+        return mrd::DiffusionDimension::kUser5;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_6)
+    {
+        return mrd::DiffusionDimension::kUser6;
+    }
+    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_7)
+    {
+        return mrd::DiffusionDimension::kUser7;
+    }
+    else
+    {
+        throw std::runtime_error("Unknown DiffusionDimension");
+    }
+}
+
+mrd::GradientDirectionType convert(ISMRMRD::GradientDirection &g)
+{
+    mrd::GradientDirectionType gradientDirection;
+    gradientDirection.rl = g.rl;
+    gradientDirection.ap = g.ap;
+    gradientDirection.fh = g.fh;
+    return gradientDirection;
+}
+
+mrd::DiffusionType convert(ISMRMRD::Diffusion &d)
+{
+    mrd::DiffusionType diffusion;
+    diffusion.gradient_direction = convert(d.gradientDirection);
+    diffusion.bvalue = d.bvalue;
+    return diffusion;
+}
+
+mrd::SequenceParametersType convert(ISMRMRD::SequenceParameters &s)
+{
+    mrd::SequenceParametersType sequenceParameters;
+
+    if (s.TR)
+    {
+        for (auto &t : *s.TR)
+        {
+            sequenceParameters.t_r.push_back(t);
+        }
+    }
+
+    if (s.TE)
+    {
+        for (auto &t : *s.TE)
+        {
+            sequenceParameters.t_e.push_back(t);
+        }
+    }
+
+    if (s.TI)
+    {
+        for (auto &t : *s.TI)
+        {
+            sequenceParameters.t_i.push_back(t);
+        }
+    }
+
+    if (s.flipAngle_deg)
+    {
+        for (auto &t : *s.flipAngle_deg)
+        {
+            sequenceParameters.flip_angledeg.push_back(t);
+        }
+    }
+
+    if (s.sequence_type)
+    {
+        sequenceParameters.sequencetype = *s.sequence_type;
+    }
+
+    if (s.echo_spacing)
+    {
+        for (auto &t : *s.echo_spacing)
+        {
+            sequenceParameters.echospacing.push_back(t);
+        }
+    }
+
+    if (s.diffusionDimension)
+    {
+        sequenceParameters.diffusion_dimension = convert(*s.diffusionDimension);
+    }
+
+    if (s.diffusion)
+    {
+        for (auto &d : *s.diffusion)
+        {
+            sequenceParameters.diffusion.push_back(convert(d));
+        }
+    }
+
+    if (s.diffusionScheme)
+    {
+        sequenceParameters.diffusion_scheme = *s.diffusionScheme;
+    }
+
+    return sequenceParameters;
+}
+
+mrd::UserParameterBase64Type convert_userbase64(ISMRMRD::UserParameterString &u)
+{
+    mrd::UserParameterBase64Type userParameterBase64;
+    userParameterBase64.name = u.name;
+    userParameterBase64.value = u.value;
+    return userParameterBase64;
+}
+
+mrd::UserParametersType convert(ISMRMRD::UserParameters &u)
+{
+    mrd::UserParametersType userParameters;
+
+    for (auto &p : u.userParameterLong)
+    {
+        userParameters.user_parameter_long.push_back(convert(p));
+    }
+
+    for (auto &p : u.userParameterDouble)
+    {
+        userParameters.user_parameter_double.push_back(convert(p));
+    }
+
+    for (auto &p : u.userParameterString)
+    {
+        userParameters.user_parameter_string.push_back(convert(p));
+    }
+
+    for (auto &p : u.userParameterBase64)
+    {
+        userParameters.user_parameter_base64.push_back(convert_userbase64(p));
+    }
+
+    return userParameters;
+}
+
+mrd::WaveformType convert(ISMRMRD::WaveformType &w)
+{
+    if (w == ISMRMRD::WaveformType::ECG)
+    {
+        return mrd::WaveformType::kEcg;
+    }
+    else if (w == ISMRMRD::WaveformType::PULSE)
+    {
+        return mrd::WaveformType::kPulse;
+    }
+    else if (w == ISMRMRD::WaveformType::RESPIRATORY)
+    {
+        return mrd::WaveformType::kRespiratory;
+    }
+    else if (w == ISMRMRD::WaveformType::TRIGGER)
+    {
+        return mrd::WaveformType::kTrigger;
+    }
+    else if (w == ISMRMRD::WaveformType::GRADIENTWAVEFORM)
+    {
+        return mrd::WaveformType::kGradientwaveform;
+    }
+    else if (w == ISMRMRD::WaveformType::OTHER)
+    {
+        return mrd::WaveformType::kOther;
+    }
+    else
+    {
+        throw std::runtime_error("Unknown WaveformType");
+    }
+}
+
+mrd::WaveformInformationType convert(ISMRMRD::WaveformInformation &w)
+{
+    mrd::WaveformInformationType waveformInformation;
+    waveformInformation.waveform_name = w.waveformName;
+    waveformInformation.waveform_type = convert(w.waveformType);
+    if (w.userParameters)
+    {
+        waveformInformation.user_parameters = convert(*w.userParameters);
+    }
+    return waveformInformation;
+}
+
 mrd::Header convert(ISMRMRD::IsmrmrdHeader &hdr)
 {
     mrd::Header h;
@@ -887,6 +983,21 @@ mrd::Header convert(ISMRMRD::IsmrmrdHeader &hdr)
     else
     {
         throw std::runtime_error("No encoding found in ISMRMRD header");
+    }
+
+    if (hdr.sequenceParameters)
+    {
+        h.sequence_parameters = convert(*hdr.sequenceParameters);
+    }
+
+    if (hdr.userParameters)
+    {
+        h.user_parameters = convert(*hdr.userParameters);
+    }
+
+    for (auto w : hdr.waveformInformation)
+    {
+        h.waveform_information.push_back(convert(w));
     }
 
     return h;
