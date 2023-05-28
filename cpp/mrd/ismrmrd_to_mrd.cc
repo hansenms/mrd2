@@ -4,6 +4,7 @@
 #include <exception>
 #include <ismrmrd/dataset.h>
 #include <ismrmrd/serialization_iostream.h>
+#include <xtensor/xview.hpp>
 
 yardl::Date date_from_string(const std::string &s)
 {
@@ -1003,6 +1004,136 @@ mrd::Header convert(ISMRMRD::IsmrmrdHeader &hdr)
     return h;
 }
 
+mrd::EncodingCounters convert(ISMRMRD::EncodingCounters &e)
+{
+    mrd::EncodingCounters encodingCounters;
+    encodingCounters.kspace_encode_step1 = e.kspace_encode_step_1;
+    encodingCounters.kspace_encode_step2 = e.kspace_encode_step_2;
+    encodingCounters.average = e.average;
+    encodingCounters.slice = e.slice;
+    encodingCounters.contrast = e.contrast;
+    encodingCounters.phase = e.phase;
+    encodingCounters.repetition = e.repetition;
+    encodingCounters.set = e.set;
+    encodingCounters.segment = e.segment;
+    for (auto &u : e.user)
+    {
+        encodingCounters.user.push_back(u);
+    }
+
+    return encodingCounters;
+}
+
+// Convert ISMRMRD::Acquisition to mrd::Acquisition
+// Acquisition: !record
+//   fields:
+//     flags: uint64
+//     idx: EncodingCounters
+//     measurementUid: uint # remove?
+//     scanCounter: uint?
+//     acquisitionTimeStamp: uint?
+//     physiologyTimeStamp: !vector
+//       items: uint
+//     channelOrder: !vector
+//       items: uint
+//     discardPre: uint?
+//     discardPost: uint?
+//     centerSample: uint?
+//     encodingSpaceRef: uint?
+//     sampleTimeUs: float?
+//     position: !array
+//       items: float
+//       dimensions: [3]
+//     readDir: !array
+//       items: float
+//       dimensions: [3]
+//     phaseDir: !array
+//       items: float
+//       dimensions: [3]
+//     sliceDir: !array
+//       items: float
+//       dimensions: [3]
+//     patientTablePosition: !array
+//       items: float
+//       dimensions: [3]
+//     userInt: !vector
+//       items: int
+//     userFloat: !vector
+//       items: float
+//     data: AcquisitionData
+//     trajectory: TrajectoryData
+//   computedFields:
+//     coils: size(data, "coils")
+//     samples: size(data, "samples")
+//     activeChannels: size(channelOrder)
+//     trajectoryDimensions: size(trajectory, "basis")
+//     tracjectorySamples: size(trajectory, "samples")
+mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
+{
+    mrd::Acquisition acquisition;
+
+    acquisition.flags = acq.flags();
+    acquisition.idx = convert(acq.idx());
+    acquisition.measurement_uid = acq.measurement_uid();
+    acquisition.scan_counter = acq.scan_counter();
+    acquisition.acquisition_time_stamp = acq.acquisition_time_stamp();
+    for (auto &p : acq.physiology_time_stamp())
+    {
+        acquisition.physiology_time_stamp.push_back(p);
+    }
+
+    // TODO: Convert channel_mask to channel_order
+    acquisition.discard_pre = acq.discard_pre();
+    acquisition.discard_post = acq.discard_post();
+    acquisition.center_sample = acq.center_sample();
+    acquisition.encoding_space_ref = acq.encoding_space_ref();
+    acquisition.sample_time_us = acq.sample_time_us();
+
+    acquisition.position[0] = acq.position()[0];
+    acquisition.position[1] = acq.position()[1];
+    acquisition.position[2] = acq.position()[2];
+
+    acquisition.read_dir[0] = acq.read_dir()[0];
+    acquisition.read_dir[1] = acq.read_dir()[1];
+    acquisition.read_dir[2] = acq.read_dir()[2];
+
+    acquisition.phase_dir[0] = acq.phase_dir()[0];
+    acquisition.phase_dir[1] = acq.phase_dir()[1];
+    acquisition.phase_dir[2] = acq.phase_dir()[2];
+
+    acquisition.slice_dir[0] = acq.slice_dir()[0];
+    acquisition.slice_dir[1] = acq.slice_dir()[1];
+    acquisition.slice_dir[2] = acq.slice_dir()[2];
+
+    acquisition.patient_table_position[0] = acq.patient_table_position()[0];
+    acquisition.patient_table_position[1] = acq.patient_table_position()[1];
+    acquisition.patient_table_position[2] = acq.patient_table_position()[2];
+
+    for (auto &p : acq.user_int())
+    {
+        acquisition.user_int.push_back(p);
+    }
+    for (auto &p : acq.user_float())
+    {
+        acquisition.user_float.push_back(p);
+    }
+
+    mrd::AcquisitionData data({acq.active_channels(), acq.number_of_samples()});
+    for (uint16_t c = 0; c < acq.active_channels(); c++)
+    {
+        for (uint16_t s = 0; s < acq.number_of_samples(); s++)
+        {
+            data(c, s) = acq.data(s, c);
+        }
+    }
+
+    acquisition.data = xt::view(data, xt::all(), xt::all());
+
+    // TODO: Trajectory data
+
+    return acquisition;
+}
+
 int main()
 {
     ISMRMRD::IStreamView rs(std::cin);
@@ -1020,6 +1151,21 @@ int main()
     {
         std::cerr << "No ISMRMRD header found in input stream." << std::endl;
         return 1;
+    }
+
+    while (deserializer.peek() != ISMRMRD::ISMRMRD_MESSAGE_CLOSE)
+    {
+        if (deserializer.peek() == ISMRMRD::ISMRMRD_MESSAGE_ACQUISITION)
+        {
+            ISMRMRD::Acquisition acq;
+            deserializer.deserialize(acq);
+            w.WriteData(convert(acq));
+        }
+        else
+        {
+            std::cerr << "Unexpected ISMRMRD message type: " << deserializer.peek() << std::endl;
+            return 1;
+        }
     }
 
     w.EndData();
