@@ -16,8 +16,16 @@ int main()
   mrd::binary::MrdReader r(std::cin);
   mrd::binary::MrdWriter w(std::cout);
 
-  mrd::Header h;
-  r.ReadHeader(h);
+  std::optional<mrd::Header> ho;
+  r.ReadHeader(ho);
+
+  if (!ho)
+  {
+    std::cerr << "Failed to read header" << std::endl;
+    return 1;
+  }
+
+  auto h = ho.value();
 
   // Just copy the header
   w.WriteHeader(h);

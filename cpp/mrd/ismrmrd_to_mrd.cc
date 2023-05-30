@@ -1101,6 +1101,129 @@ mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
     return acquisition;
 }
 
+// Convert ISMRMRD::Image<T> to mrd::Image<T>
+// Schema:
+// Image<T>: !record
+//   fields:
+//     flags: uint64
+//     measurementUid: uint #Remove?
+//     fieldOfView: !array
+//       items: float
+//       dimensions: [3]
+//     position: !array
+//       items: float
+//       dimensions: [3]
+//     colDir: !array
+//       items: float
+//       dimensions: [3]
+//     lineDir: !array
+//       items: float
+//       dimensions: [3]
+//     sliceDir: !array
+//       items: float
+//       dimensions: [3]
+//     patientTablePosition: !array
+//       items: float
+//       dimensions: [3]
+//     average: uint?
+//     slice: uint?
+//     contrast: uint?
+//     phase: uint
+//     repetition: uint?
+//     set: uint?
+//     acquisitionTimeStamp: uint?
+//     physiologyTimeStamp: !array
+//       items: uint
+//       dimensions: [3]
+//     imageType: ImageType
+//     imageIndex: uint?
+//     imageSeriesIndex: uint?
+//     userInt: !vector
+//       items: int
+//     userFloat: !vector
+//       items: float
+//     data: ImageData<T>
+//     meta: string->string
+//   computedFields:
+//     channels: size(data, "channel")
+//     slices: size(data, "z")
+//     rows: size(data, "y")
+//     cols: size(data, "x")
+template <typename T>
+mrd::Image<T> convert(ISMRMRD::Image<T> &im)
+{
+    mrd::Image<T> image;
+    image.flags = im.getFlags();
+    image.measurement_uid = im.getMeasurementUid();
+    image.field_of_view[0] = im.getFieldOfViewX();
+    image.field_of_view[1] = im.getFieldOfViewY();
+    image.field_of_view[2] = im.getFieldOfViewZ();
+    image.position[0] = im.getPositionX();
+    image.position[1] = im.getPositionY();
+    image.position[2] = im.getPositionZ();
+    image.col_dir[0] = im.getReadDirectionX();
+    image.col_dir[1] = im.getReadDirectionY();
+    image.col_dir[2] = im.getReadDirectionZ();
+    image.line_dir[0] = im.getPhaseDirectionX();
+    image.line_dir[1] = im.getPhaseDirectionY();
+    image.line_dir[2] = im.getPhaseDirectionZ();
+    image.slice_dir[0] = im.getSliceDirectionX();
+    image.slice_dir[1] = im.getSliceDirectionY();
+    image.slice_dir[2] = im.getSliceDirectionZ();
+    image.patient_table_position[0] = im.getPatientTablePositionX();
+    image.patient_table_position[1] = im.getPatientTablePositionY();
+    image.patient_table_position[2] = im.getPatientTablePositionZ();
+    image.average = im.getAverage();
+    image.slice = im.getSlice();
+    image.contrast = im.getContrast();
+    image.phase = im.getPhase();
+    image.repetition = im.getRepetition();
+    image.set = im.getSet();
+    image.acquisition_time_stamp = im.getAcquisitionTimeStamp();
+    image.physiology_time_stamp[0] = im.getPhysiologyTimeStamp(0);
+    image.physiology_time_stamp[1] = im.getPhysiologyTimeStamp(1);
+    image.physiology_time_stamp[2] = im.getPhysiologyTimeStamp(2);
+
+    if (im.getImageType() == ISMRMRD::ISMRMRD_ImageTypes::ISMRMRD_IMTYPE_COMPLEX)
+    {
+        image.image_type = mrd::ImageType::kComplex;
+    }
+    else if (im.getImageType() == ISMRMRD::ISMRMRD_ImageTypes::ISMRMRD_IMTYPE_MAGNITUDE)
+    {
+        image.image_type = mrd::ImageType::kMagnitude;
+    }
+    else if (im.getImageType() == ISMRMRD::ISMRMRD_ImageTypes::ISMRMRD_IMTYPE_REAL)
+    {
+        image.image_type = mrd::ImageType::kReal;
+    }
+    else if (im.getImageType() == ISMRMRD::ISMRMRD_ImageTypes::ISMRMRD_IMTYPE_PHASE)
+    {
+        image.image_type = mrd::ImageType::kPhase;
+    }
+    else if (im.getImageType() == ISMRMRD::ISMRMRD_ImageTypes::ISMRMRD_IMTYPE_IMAG)
+    {
+        image.image_type = mrd::ImageType::kImag;
+    }
+    else
+    {
+        throw std::runtime_error("Unknown image type");
+    }
+
+    image.image_index = im.getImageIndex();
+    image.image_series_index = im.getImageSeriesIndex();
+    for (int i = 0; i < ISMRMRD::ISMRMRD_USER_INTS; i++)
+    {
+        image.user_int.push_back(im.getUserInt(i));
+    }
+    for (int i = 0; i < ISMRMRD::ISMRMRD_USER_FLOATS; i++)
+    {
+        image.user_float.push_back(im.getUserFloat(i));
+    }
+    // image.data = convert(im.data());
+    // image.meta = im.meta();
+    return image;
+}
+
 int main()
 {
     ISMRMRD::IStreamView rs(std::cin);
@@ -1116,8 +1239,7 @@ int main()
     }
     else
     {
-        std::cerr << "No ISMRMRD header found in input stream." << std::endl;
-        return 1;
+        w.WriteHeader(std::nullopt);
     }
 
     while (deserializer.peek() != ISMRMRD::ISMRMRD_MESSAGE_CLOSE)
@@ -1127,6 +1249,79 @@ int main()
             ISMRMRD::Acquisition acq;
             deserializer.deserialize(acq);
             w.WriteData(convert(acq));
+        }
+        else if (deserializer.peek() == ISMRMRD::ISMRMRD_MESSAGE_IMAGE)
+        {
+            if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_USHORT)
+            {
+                ISMRMRD::Image<unsigned short> img;
+                deserializer.deserialize(img);
+
+                std::cerr << "USHORT IMAGE ENCOUNTERED" << std::endl;
+                // Convert Image
+            }
+            else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_SHORT)
+            {
+                ISMRMRD::Image<short> img;
+                deserializer.deserialize(img);
+
+                // Convert Image
+            }
+            else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_UINT)
+            {
+                ISMRMRD::Image<unsigned int> img;
+                deserializer.deserialize(img);
+
+                // Convert Image
+            }
+            else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_INT)
+            {
+                ISMRMRD::Image<int> img;
+                deserializer.deserialize(img);
+
+                // Convert Image
+            }
+            else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_FLOAT)
+            {
+                ISMRMRD::Image<float> img;
+                deserializer.deserialize(img);
+
+                auto image = convert(img);
+                std::cerr << "FLOAT IMAGE ENCOUNTERED" << std::endl;
+                // Convert Image
+            }
+            else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_DOUBLE)
+            {
+                ISMRMRD::Image<double> img;
+                deserializer.deserialize(img);
+
+                // Convert Image
+            }
+            else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_CXFLOAT)
+            {
+                ISMRMRD::Image<std::complex<float>> img;
+                deserializer.deserialize(img);
+
+                // Convert Image
+            }
+            else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_CXDOUBLE)
+            {
+                ISMRMRD::Image<std::complex<double>> img;
+                deserializer.deserialize(img);
+
+                // Convert Image
+            }
+            else
+            {
+                throw std::runtime_error("Unknown image type");
+            }
+        }
+        else if (deserializer.peek() == ISMRMRD::ISMRMRD_MESSAGE_WAVEFORM)
+        {
+            ISMRMRD::Waveform wfm;
+            deserializer.deserialize(wfm);
+
+            // Convert Waveform
         }
         else
         {

@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     mrd::binary::MrdReader r(std::cin);
 
-    mrd::Header h;
+    std::optional<mrd::Header> h;
     r.ReadHeader(h);
 
     mrd::StreamItem v;

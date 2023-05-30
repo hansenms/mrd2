@@ -76,9 +76,7 @@ Image<T>: !record
     userFloat: !vector
       items: float
     data: ImageData<T>
-    #h5py does not like the HDF5 that comes out of the nested variable length string.
-    #meta: !vector
-    #  items: ImageMetaData
+    meta: string->string
   computedFields:
     channels: size(data, "channel")
     slices: size(data, "z")
