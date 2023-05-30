@@ -81,6 +81,7 @@
         "cschlosser.doxdocgen",
         "eamodio.gitlens",
         "esbenp.prettier-vscode",
+        "GitHub.copilot",
         "JacquesLucke.gcov-viewer",
         "jinliming2.vscode-go-template",
         "matepek.vscode-catch2-test-adapter",

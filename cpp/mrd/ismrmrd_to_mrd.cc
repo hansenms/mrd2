@@ -1023,6 +1023,7 @@ mrd::EncodingCounters convert(ISMRMRD::EncodingCounters &e)
 
     return encodingCounters;
 }
+
 mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
 {
     mrd::Acquisition acquisition;
