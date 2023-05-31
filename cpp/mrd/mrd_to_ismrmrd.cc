@@ -1286,15 +1286,13 @@ struct typeid_for<std::complex<double>>
 template <class T>
 ISMRMRD::Image<T> convert(mrd::Image<T> &image)
 {
-    ISMRMRD::Image<T> im(image.Columns(), image.Rows(), image.Slices(), image.Channels());
+    ISMRMRD::Image<T> im(image.Cols(), image.Rows(), image.Slices(), image.Channels());
     im.setFlags(image.flags);
-    im.setVersion(ISMRMRD_VERSION_MAJOR);
-    im.setDataType(typeid_for<T>::value);
     im.setMeasurementUid(image.measurement_uid);
     im.setFieldOfView(image.field_of_view[0], image.field_of_view[1], image.field_of_view[2]);
     im.setPosition(image.position[0], image.position[1], image.position[2]);
     im.setReadDirection(image.col_dir[0], image.col_dir[1], image.col_dir[2]);
-    im.setPhaseDirection(image.row_dir[0], image.row_dir[1], image.row_dir[2]);
+    im.setPhaseDirection(image.line_dir[0], image.line_dir[1], image.line_dir[2]);
     im.setSliceDirection(image.slice_dir[0], image.slice_dir[1], image.slice_dir[2]);
     im.setPatientTablePosition(image.patient_table_position[0], image.patient_table_position[1], image.patient_table_position[2]);
     im.setAverage(image.average ? *image.average : 0);
@@ -1307,9 +1305,32 @@ ISMRMRD::Image<T> convert(mrd::Image<T> &image)
     im.setPhysiologyTimeStamp(0, image.physiology_time_stamp[0]);
     im.setPhysiologyTimeStamp(1, image.physiology_time_stamp[1]);
     im.setPhysiologyTimeStamp(2, image.physiology_time_stamp[2]);
-    im.setImageType(image.image_type);
-    im.setImageIndex(image.image_index);
-    im.setImageSeriesIndex(image.image_series_index);
+    if (image.image_type == mrd::ImageType::kMagnitude)
+    {
+        im.setImageType(ISMRMRD::ISMRMRD_IMTYPE_MAGNITUDE);
+    }
+    else if (image.image_type == mrd::ImageType::kPhase)
+    {
+        im.setImageType(ISMRMRD::ISMRMRD_IMTYPE_PHASE);
+    }
+    else if (image.image_type == mrd::ImageType::kReal)
+    {
+        im.setImageType(ISMRMRD::ISMRMRD_IMTYPE_REAL);
+    }
+    else if (image.image_type == mrd::ImageType::kImag)
+    {
+        im.setImageType(ISMRMRD::ISMRMRD_IMTYPE_IMAG);
+    }
+    else if (image.image_type == mrd::ImageType::kComplex)
+    {
+        im.setImageType(ISMRMRD::ISMRMRD_IMTYPE_COMPLEX);
+    }
+    else
+    {
+        throw std::runtime_error("Unknown image type");
+    }
+    im.setImageIndex(image.image_index ? *image.image_index : 0);
+    im.setImageSeriesIndex(image.image_series_index ? *image.image_series_index : 0);
 
     if (image.user_int.size() > ISMRMRD::ISMRMRD_USER_INTS)
     {
@@ -1336,7 +1357,7 @@ ISMRMRD::Image<T> convert(mrd::Image<T> &image)
     {
         for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++)
         {
-            meta.append(it->first, *it2);
+            meta.append(it->first.c_str(), (*it2).c_str());
         }
     }
 
@@ -1361,32 +1382,30 @@ ISMRMRD::Image<T> convert(mrd::Image<T> &image)
     return im;
 }
 
-template <>
-ISMRMRD::Image<uint16_t> convert(mrd::Image<uint16_t> &image);
-
-template <>
-ISMRMRD::Image<int16_t> convert(mrd::Image<int16_t> &image);
-
-template <>
-ISMRMRD::Image<uint32_t> convert(mrd::Image<uint32_t> &image);
-
-template <>
-ISMRMRD::Image<int32_t> convert(mrd::Image<int32_t> &image);
-
-template <>
-ISMRMRD::Image<float> convert(mrd::Image<float> &image);
-
-template <>
-ISMRMRD::Image<double> convert(mrd::Image<double> &image);
-
-template <>
-ISMRMRD::Image<std::complex<float>> convert(mrd::Image<std::complex<float>> &image);
-
-template <>
-ISMRMRD::Image<std::complex<double>> convert(mrd::Image<std::complex<double>> &image);
-
 int main()
 {
-    std::cerr << "Hello World!" << std::endl;
+    ISMRMRD::OStreamView ws(std::cout);
+    ISMRMRD::ProtocolSerializer serializer(ws);
+    mrd::binary::MrdReader r(std::cin);
+
+    std::optional<mrd::Header> header;
+    r.ReadHeader(header);
+    if (header)
+    {
+        std::cerr << "Header found" << std::endl;
+        serializer.serialize(convert(*header));
+    }
+
+    mrd::StreamItem item;
+    while (r.ReadData(item))
+    {
+        std::cerr << "Item found" << std::endl;
+        std::visit([&serializer](auto &&arg)
+                   { serializer.serialize(convert(arg)); },
+                   item);
+    }
+
+    serializer.close();
+
     return 0;
 }

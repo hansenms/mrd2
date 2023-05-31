@@ -49,7 +49,7 @@ Image<T>: !record
     average: uint?
     slice: uint?
     contrast: uint?
-    phase: uint
+    phase: uint?
     repetition: uint?
     set: uint?
     acquisitionTimeStamp: uint?
