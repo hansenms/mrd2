@@ -1,5 +1,4 @@
-StreamItem: [Acquisition, Waveform<uint32>, Image<uint16>, Image<int16>, Image<uint>, Image<int>, Image<float>, Image<double>, Image<complexfloat>, Image<complexdouble>
-]
+StreamItem: [Acquisition, Waveform<uint32>, Image<uint16>, Image<int16>, Image<uint>, Image<int>, Image<float>, Image<double>, Image<complexfloat>, Image<complexdouble>]
 
 Mrd: !protocol
   sequence:
