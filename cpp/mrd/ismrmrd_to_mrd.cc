@@ -1102,54 +1102,43 @@ mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
     return acquisition;
 }
 
-// Convert ISMRMRD::Image<T> to mrd::Image<T>
+// Convert ISMRMRD::Waveform to mrd::Waveform<uint32>
 // Schema:
-// Image<T>: !record
+// Waveform<T>: !record
 //   fields:
-//     flags: uint64
-//     measurementUid: uint #Remove?
-//     fieldOfView: !array
-//       items: float
-//       dimensions: [3]
-//     position: !array
-//       items: float
-//       dimensions: [3]
-//     colDir: !array
-//       items: float
-//       dimensions: [3]
-//     lineDir: !array
-//       items: float
-//       dimensions: [3]
-//     sliceDir: !array
-//       items: float
-//       dimensions: [3]
-//     patientTablePosition: !array
-//       items: float
-//       dimensions: [3]
-//     average: uint?
-//     slice: uint?
-//     contrast: uint?
-//     phase: uint
-//     repetition: uint?
-//     set: uint?
-//     acquisitionTimeStamp: uint?
-//     physiologyTimeStamp: !array
-//       items: uint
-//       dimensions: [3]
-//     imageType: ImageType
-//     imageIndex: uint?
-//     imageSeriesIndex: uint?
-//     userInt: !vector
-//       items: int
-//     userFloat: !vector
-//       items: float
-//     data: ImageData<T>
-//     meta: string->string
+//     flags: !vector
+//       items: uint # There are currently no flags defined.
+//     measurementUid: uint # Remove?
+//     scanCounter: uint
+//     timeStamp: uint
+//     sampleTimeUs: float
+//     waveformId: uint
+//     data: WaveformSamples<T>
 //   computedFields:
-//     channels: size(data, "channel")
-//     slices: size(data, "z")
-//     rows: size(data, "y")
-//     cols: size(data, "x")
+//     channels: size(data, "channels")
+//     numberOfSamples: size(data, "samples")
+mrd::Waveform<uint32_t> convert(ISMRMRD::Waveform &wfm)
+{
+    mrd::Waveform<uint32_t> waveform;
+    waveform.flags = wfm.head.flags;
+    waveform.measurement_uid = wfm.head.measurement_uid;
+    waveform.scan_counter = wfm.head.scan_counter;
+    waveform.time_stamp = wfm.head.time_stamp;
+    waveform.sample_time_us = wfm.head.sample_time_us;
+
+    mrd::WaveformSamples<uint32_t> data({wfm.head.channels, wfm.head.number_of_samples});
+    for (uint16_t c = 0; c < wfm.head.channels; c++)
+    {
+        for (uint16_t s = 0; s < wfm.head.number_of_samples; s++)
+        {
+            data(c, s) = wfm.data[c * wfm.head.number_of_samples + s];
+        }
+    }
+
+    waveform.data = xt::view(data, xt::all(), xt::all());
+    return waveform;
+}
+
 template <typename T>
 mrd::Image<T> convert(ISMRMRD::Image<T> &im)
 {
@@ -1284,59 +1273,50 @@ int main()
             {
                 ISMRMRD::Image<unsigned short> img;
                 deserializer.deserialize(img);
-
-                std::cerr << "USHORT IMAGE ENCOUNTERED" << std::endl;
-                // Convert Image
+                w.WriteData(convert(img));
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_SHORT)
             {
                 ISMRMRD::Image<short> img;
                 deserializer.deserialize(img);
-
-                // Convert Image
+                w.WriteData(convert(img));
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_UINT)
             {
                 ISMRMRD::Image<unsigned int> img;
                 deserializer.deserialize(img);
-
-                // Convert Image
+                w.WriteData(convert(img));
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_INT)
             {
                 ISMRMRD::Image<int> img;
                 deserializer.deserialize(img);
-
-                // Convert Image
+                w.WriteData(convert(img));
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_FLOAT)
             {
                 std::cerr << "FLOAT IMAGE ENCOUNTERED" << std::endl;
                 ISMRMRD::Image<float> img;
                 deserializer.deserialize(img);
-                auto image = convert(img);
-                w.WriteData(image);
+                w.WriteData(convert(img));
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_DOUBLE)
             {
                 ISMRMRD::Image<double> img;
                 deserializer.deserialize(img);
-
-                // Convert Image
+                w.WriteData(convert(img));
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_CXFLOAT)
             {
                 ISMRMRD::Image<std::complex<float>> img;
                 deserializer.deserialize(img);
-
-                // Convert Image
+                w.WriteData(convert(img));
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_CXDOUBLE)
             {
                 ISMRMRD::Image<std::complex<double>> img;
                 deserializer.deserialize(img);
-
-                // Convert Image
+                w.WriteData(convert(img));
             }
             else
             {
@@ -1347,8 +1327,7 @@ int main()
         {
             ISMRMRD::Waveform wfm;
             deserializer.deserialize(wfm);
-
-            // Convert Waveform
+            w.WriteData(convert(wfm));
         }
         else
         {
