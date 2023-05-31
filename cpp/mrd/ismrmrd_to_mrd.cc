@@ -3,6 +3,7 @@
 #include <iostream>
 #include <exception>
 #include <ismrmrd/dataset.h>
+#include <ismrmrd/meta.h>
 #include <ismrmrd/serialization_iostream.h>
 #include <xtensor/xview.hpp>
 
@@ -1219,8 +1220,35 @@ mrd::Image<T> convert(ISMRMRD::Image<T> &im)
     {
         image.user_float.push_back(im.getUserFloat(i));
     }
-    // image.data = convert(im.data());
-    // image.meta = im.meta();
+
+    mrd::ImageData<T> data({im.getNumberOfChannels(), im.getMatrixSizeZ(), im.getMatrixSizeY(), im.getMatrixSizeX()});
+    for (int c = 0; c < im.getNumberOfChannels(); c++)
+    {
+        for (int z = 0; z < im.getMatrixSizeZ(); z++)
+        {
+            for (int y = 0; y < im.getMatrixSizeY(); y++)
+            {
+                for (int x = 0; x < im.getMatrixSizeX(); x++)
+                {
+                    data(c, z, y, x) = im(x, y, z, c);
+                }
+            }
+        }
+    }
+
+    image.data = xt::view(data, xt::all(), xt::all(), xt::all(), xt::all());
+
+    ISMRMRD::MetaContainer meta;
+    ISMRMRD::deserialize(im.getAttributeString(), meta);
+
+    for (auto it = meta.begin(); it != meta.end(); it++)
+    {
+        for (auto it2 = it->second.begin(); it2 != it->second.end(); it2++)
+        {
+            image.meta[it->first].push_back(it2->as_str());
+        }
+    }
+
     return image;
 }
 
@@ -1283,12 +1311,11 @@ int main()
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_FLOAT)
             {
+                std::cerr << "FLOAT IMAGE ENCOUNTERED" << std::endl;
                 ISMRMRD::Image<float> img;
                 deserializer.deserialize(img);
-
                 auto image = convert(img);
-                std::cerr << "FLOAT IMAGE ENCOUNTERED" << std::endl;
-                // Convert Image
+                w.WriteData(image);
             }
             else if (deserializer.peek_image_data_type() == ISMRMRD::ISMRMRD_DOUBLE)
             {

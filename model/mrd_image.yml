@@ -76,7 +76,9 @@ Image<T>: !record
     userFloat: !vector
       items: float
     data: ImageData<T>
-    meta: string->string
+    meta: !map
+      keys: string
+      values: string*
   computedFields:
     channels: size(data, "channel")
     slices: size(data, "z")
