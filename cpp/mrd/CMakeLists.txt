@@ -72,3 +72,14 @@ target_link_libraries(
   ${ImageMagick_LIBRARIES}
   fmt::fmt
 )
+
+add_executable(
+  mrd_to_ismrmrd
+  mrd_to_ismrmrd.cc
+)
+
+target_link_libraries(
+  mrd_to_ismrmrd
+  mrd_generated
+  ISMRMRD::ISMRMRD
+)

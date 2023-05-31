@@ -57,8 +57,7 @@ Image<T>: !record
     imageType: ImageType
     imageIndex: uint?
     imageSeriesIndex: uint?
-    userInt: !vector
-      items: int
+    userInt: int*
     userFloat: float*
     data: ImageData<T>
     meta: string->string*
