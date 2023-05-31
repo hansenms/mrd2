@@ -1040,6 +1040,7 @@ mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
     }
 
     // TODO: Convert channel_mask to channel_order
+
     acquisition.discard_pre = acq.discard_pre();
     acquisition.discard_post = acq.discard_post();
     acquisition.center_sample = acq.center_sample();
@@ -1102,21 +1103,6 @@ mrd::Acquisition convert(ISMRMRD::Acquisition &acq)
     return acquisition;
 }
 
-// Convert ISMRMRD::Waveform to mrd::Waveform<uint32>
-// Schema:
-// Waveform<T>: !record
-//   fields:
-//     flags: !vector
-//       items: uint # There are currently no flags defined.
-//     measurementUid: uint # Remove?
-//     scanCounter: uint
-//     timeStamp: uint
-//     sampleTimeUs: float
-//     waveformId: uint
-//     data: WaveformSamples<T>
-//   computedFields:
-//     channels: size(data, "channels")
-//     numberOfSamples: size(data, "samples")
 mrd::Waveform<uint32_t> convert(ISMRMRD::Waveform &wfm)
 {
     mrd::Waveform<uint32_t> waveform;

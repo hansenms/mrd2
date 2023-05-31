@@ -61,8 +61,7 @@ MeasurementInformationType: !record
     protocolName: string?
     sequenceName: string?
     seriesDescription: string?
-    measurementDependency: !vector
-      items: MeasurementDependencyType
+    measurementDependency: MeasurementDependencyType*
     seriesInstanceUIDRoot: string?
     frameOfReferenceUID: string?
     referencedImageSequence: ReferencedImageSequenceType?
@@ -79,8 +78,7 @@ AcquisitionSystemInformationType: !record
     systemFieldStrengthT: float?
     relativeReceiverNoiseBandwidth: float?
     receiverChannels: uint?
-    coilLabel: !vector
-      items: CoilLabelType
+    coilLabel: CoilLabelType*
     institutionName: string?
     stationName: string?
     deviceID: string?
@@ -161,12 +159,9 @@ UserParameterStringType: !record
 TrajectoryDescriptionType: !record
   fields:
     identifier: string
-    userParameterLong: !vector
-      items: UserParameterLongType
-    userParameterDouble: !vector
-      items: UserParameterDoubleType
-    userParameterString: !vector
-      items: UserParameterStringType
+    userParameterLong: UserParameterLongType*
+    userParameterDouble: UserParameterDoubleType*
+    userParameterString: UserParameterStringType*
     comment: string?
 
 AccelerationFactorType: !record
@@ -202,8 +197,7 @@ Calibration: !enum
 
 MultibandType: !record
   fields:
-    spacing: !vector
-      items: MultibandSpacingType
+    spacing: MultibandSpacingType*
     deltaKz: float
     multibandfactor: uint
     calibration: Calibration
@@ -263,8 +257,7 @@ SequenceParametersType: !record
     sequencetype: string?
     echospacing: float*
     diffusionDimension: DiffusionDimension?
-    diffusion: !vector
-      items: DiffusionType
+    diffusion: DiffusionType*
     diffusionScheme: string?
 
 UserParameterBase64Type: !record
@@ -274,14 +267,10 @@ UserParameterBase64Type: !record
 
 UserParametersType: !record
   fields:
-    userParameterLong: !vector
-      items: UserParameterLongType
-    userParameterDouble: !vector
-      items: UserParameterDoubleType
-    userParameterString: !vector
-      items: UserParameterStringType
-    userParameterBase64: !vector
-      items: UserParameterBase64Type
+    userParameterLong: UserParameterLongType*
+    userParameterDouble: UserParameterDoubleType*
+    userParameterString: UserParameterStringType*
+    userParameterBase64: UserParameterBase64Type*
 
 WaveformType: !enum
     values:
@@ -306,10 +295,8 @@ Header: !record
     measurementInformation: MeasurementInformationType?
     acquisitionSystemInformation: AcquisitionSystemInformationType?
     experimentalConditions: ExperimentalConditionsType
-    encoding: !vector
-      items: EncodingType
+    encoding: EncodingType*
     sequenceParameters: SequenceParametersType?
     userParameters: UserParametersType?
-    waveformInformation: !vector
-      items: WaveformInformationType
+    waveformInformation: WaveformInformationType*
 
