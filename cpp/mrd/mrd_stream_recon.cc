@@ -81,6 +81,7 @@ int main()
         auto pixel_data = xt::sqrt(xt::abs(xt::sum(buffer * xt::conj(buffer), 0)));
         mrd::Image<float> im;
         im.data = xt::zeros<float>(image_shape);
+        im.image_type = mrd::ImageType::kMagnitude;
         xt::view(im.data, 0, xt::all(), xt::all(), xt::all()) = pixel_data;
         w.WriteData(im);
       }

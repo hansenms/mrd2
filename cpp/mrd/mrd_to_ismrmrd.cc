@@ -1392,14 +1392,12 @@ int main()
     r.ReadHeader(header);
     if (header)
     {
-        std::cerr << "Header found" << std::endl;
         serializer.serialize(convert(*header));
     }
 
     mrd::StreamItem item;
     while (r.ReadData(item))
     {
-        std::cerr << "Item found" << std::endl;
         std::visit([&serializer](auto &&arg)
                    { serializer.serialize(convert(arg)); },
                    item);
