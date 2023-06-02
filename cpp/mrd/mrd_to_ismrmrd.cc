@@ -1051,7 +1051,7 @@ ISMRMRD::Acquisition convert(mrd::Acquisition &acq)
     ISMRMRD::AcquisitionHeader hdr;
 
     hdr.version = ISMRMRD_VERSION_MAJOR;
-    hdr.flags = acq.flags;
+    hdr.flags = acq.flags.Value();
     hdr.measurement_uid = acq.measurement_uid;
     hdr.scan_counter = acq.scan_counter ? *acq.scan_counter : 0;
     hdr.acquisition_time_stamp = acq.acquisition_time_stamp ? *acq.acquisition_time_stamp : 0;
@@ -1182,7 +1182,7 @@ template <class T>
 ISMRMRD::Image<T> convert(mrd::Image<T> &image)
 {
     ISMRMRD::Image<T> im(image.Cols(), image.Rows(), image.Slices(), image.Channels());
-    im.setFlags(image.flags);
+    im.setFlags(image.flags.Value());
     im.setMeasurementUid(image.measurement_uid);
     im.setFieldOfView(image.field_of_view[0], image.field_of_view[1], image.field_of_view[2]);
     im.setPosition(image.position[0], image.position[1], image.position[2]);

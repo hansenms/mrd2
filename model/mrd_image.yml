@@ -1,4 +1,5 @@
 ImageFlags: !flags
+  base: uint64
   values:
     isNavigationData: 0x1
     firstInAverage: 0x10
