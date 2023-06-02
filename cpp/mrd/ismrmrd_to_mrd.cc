@@ -671,34 +671,28 @@ mrd::EncodingType convert(ISMRMRD::Encoding &e)
     encoding.recon_space = convert(e.reconSpace);
     encoding.encoding_limits = convert(e.encodingLimits);
 
-    if (e.trajectory == ISMRMRD::TrajectoryType::CARTESIAN)
+    switch (e.trajectory)
     {
+    case ISMRMRD::TrajectoryType::CARTESIAN:
         encoding.trajectory = mrd::Trajectory::kCartesian;
-    }
-    else if (e.trajectory == ISMRMRD::TrajectoryType::EPI)
-    {
+        break;
+    case ISMRMRD::TrajectoryType::EPI:
         encoding.trajectory = mrd::Trajectory::kEpi;
-    }
-    else if (e.trajectory == ISMRMRD::TrajectoryType::RADIAL)
-    {
+        break;
+    case ISMRMRD::TrajectoryType::RADIAL:
         encoding.trajectory = mrd::Trajectory::kRadial;
-    }
-    else if (e.trajectory == ISMRMRD::TrajectoryType::GOLDENANGLE)
-    {
+        break;
+    case ISMRMRD::TrajectoryType::GOLDENANGLE:
         encoding.trajectory = mrd::Trajectory::kGoldenangle;
-    }
-    else if (e.trajectory == ISMRMRD::TrajectoryType::SPIRAL)
-    {
+        break;
+    case ISMRMRD::TrajectoryType::SPIRAL:
         encoding.trajectory = mrd::Trajectory::kSpiral;
-    }
-    else if (e.trajectory == ISMRMRD::TrajectoryType::OTHER)
-    {
+        break;
+    case ISMRMRD::TrajectoryType::OTHER:
         encoding.trajectory = mrd::Trajectory::kOther;
-    }
-    else
-    {
-        // throw error
-        throw std::runtime_error("Unknown trajectory type");
+        break;
+    default:
+        throw std::runtime_error("Unknown TrajectoryType");
     }
 
     if (e.trajectoryDescription)
