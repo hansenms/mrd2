@@ -15,7 +15,7 @@ build: configure
     python utils/xsd-to-yardl.py ismrmrd.xsd > model/mrd_header.yml
     rm ismrmrd.xsd
 
-generate: convert-xsd
+generate:
     cd model && yardl generate
 
 @converter-roundtrip-test:

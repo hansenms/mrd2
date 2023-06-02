@@ -6,12 +6,14 @@ from io import StringIO
 import string
 
 def to_pascal_case(s: str):
-    res = s.replace("_", " ").replace(" ", "")
+    temp = s.split('_')
+    res = temp[0] + ''.join(ele.title() for ele in temp[1:])
     res = res[0].upper() + res[1:]
     return res
 
 def to_camel_case(s: str):
-    res = s.replace("_", " ").replace(" ", "")
+    temp = s.split('_')
+    res = temp[0] + ''.join(ele.title() for ele in temp[1:])
     res = res[0].lower() + res[1:]
     return res
 

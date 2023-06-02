@@ -13,13 +13,7 @@ yardl::Date date_from_string(const std::string &s)
 {
     std::stringstream ss{s};
     yardl::Date d;
-#if __cplusplus < 202002L
     ss >> date::parse("%F", d);
-#else
-    date::local_days ld;
-    ss >> date::parse("%F", ld);
-    d = yardl::Date(ld.time_since_epoch());
-#endif
     return d;
 }
 
@@ -27,18 +21,13 @@ yardl::Time time_from_string(const std::string &s)
 {
     std::stringstream ss{s};
     yardl::Time t;
-#if __cplusplus < 202002L
-    ss >> date::parse("%F", t);
-#else
-    date::local_days ld;
-    ss >> date::parse("%F", ld);
-    t = yardl::Date(ld.time_since_epoch());
-#endif
+    ss >> date::parse("%T", t);
 
     if (ss.fail())
     {
         throw std::runtime_error("invalid date format");
     }
+
     return t;
 };
 
@@ -54,12 +43,12 @@ mrd::SubjectInformationType convert(ISMRMRD::SubjectInformation &subjectInformat
 
     if (subjectInformation.patientWeight_kg)
     {
-        s.patient_weightkg = *subjectInformation.patientWeight_kg;
+        s.patient_weight_kg = *subjectInformation.patientWeight_kg;
     }
 
     if (subjectInformation.patientHeight_m)
     {
-        s.patient_heightm = *subjectInformation.patientHeight_m;
+        s.patient_height_m = *subjectInformation.patientHeight_m;
     }
 
     if (subjectInformation.patientID)
@@ -362,9 +351,9 @@ mrd::MatrixSizeType convert(ISMRMRD::MatrixSize &m)
 }
 
 // Convert ISMRMRD::FieldOfView_mm to mrd::FieldOfViewmm
-mrd::FieldOfViewmm convert(ISMRMRD::FieldOfView_mm &f)
+mrd::FieldOfViewMm convert(ISMRMRD::FieldOfView_mm &f)
 {
-    mrd::FieldOfViewmm fieldOfView;
+    mrd::FieldOfViewMm fieldOfView;
     fieldOfView.x = f.x;
     fieldOfView.y = f.y;
     fieldOfView.z = f.z;
@@ -376,7 +365,7 @@ mrd::EncodingSpaceType convert(ISMRMRD::EncodingSpace &e)
 {
     mrd::EncodingSpaceType encodingSpace;
     encodingSpace.matrix_size = convert(e.matrixSize);
-    encodingSpace.field_of_viewmm = convert(e.fieldOfView_mm);
+    encodingSpace.field_of_view_mm = convert(e.fieldOfView_mm);
     return encodingSpace;
 }
 
@@ -397,17 +386,17 @@ mrd::EncodingLimitsType convert(ISMRMRD::EncodingLimits &e)
 
     if (e.kspace_encoding_step_0)
     {
-        encodingLimits.kspaceencodingstep0 = convert(*e.kspace_encoding_step_0);
+        encodingLimits.kspace_encoding_step0 = convert(*e.kspace_encoding_step_0);
     }
 
     if (e.kspace_encoding_step_1)
     {
-        encodingLimits.kspaceencodingstep1 = convert(*e.kspace_encoding_step_1);
+        encodingLimits.kspace_encoding_step1 = convert(*e.kspace_encoding_step_1);
     }
 
     if (e.kspace_encoding_step_2)
     {
-        encodingLimits.kspaceencodingstep2 = convert(*e.kspace_encoding_step_2);
+        encodingLimits.kspace_encoding_step2 = convert(*e.kspace_encoding_step_2);
     }
 
     if (e.average)
@@ -548,8 +537,8 @@ mrd::TrajectoryDescriptionType convert(ISMRMRD::TrajectoryDescription &t)
 mrd::AccelerationFactorType convert(ISMRMRD::AccelerationFactor &a)
 {
     mrd::AccelerationFactorType accelerationFactor;
-    accelerationFactor.kspaceencodingstep1 = a.kspace_encoding_step_1;
-    accelerationFactor.kspaceencodingstep2 = a.kspace_encoding_step_2;
+    accelerationFactor.kspace_encoding_step1 = a.kspace_encoding_step_1;
+    accelerationFactor.kspace_encoding_step2 = a.kspace_encoding_step_2;
     return accelerationFactor;
 }
 
@@ -625,20 +614,15 @@ mrd::MultibandSpacingType convert(ISMRMRD::MultibandSpacing &m)
 // Convert ISMRMRD::MultibandCalibrationType to mrd::Calibration
 mrd::Calibration convert(ISMRMRD::MultibandCalibrationType &m)
 {
-    if (m == ISMRMRD::MultibandCalibrationType::SEPARABLE2D)
+    switch (m)
     {
+    case ISMRMRD::MultibandCalibrationType::SEPARABLE2D:
         return mrd::Calibration::kSeparable2D;
-    }
-    else if (m == ISMRMRD::MultibandCalibrationType::FULL3D)
-    {
+    case ISMRMRD::MultibandCalibrationType::FULL3D:
         return mrd::Calibration::kFull3D;
-    }
-    else if (m == ISMRMRD::MultibandCalibrationType::OTHER)
-    {
+    case ISMRMRD::MultibandCalibrationType::OTHER:
         return mrd::Calibration::kOther;
-    }
-    else
-    {
+    default:
         throw std::runtime_error("Unknown Calibration");
     }
 }
@@ -652,9 +636,9 @@ mrd::MultibandType convert(ISMRMRD::Multiband &m)
         multiband.spacing.push_back(convert(s));
     }
     multiband.delta_kz = m.deltaKz;
-    multiband.multibandfactor = m.multiband_factor;
+    multiband.multiband_factor = m.multiband_factor;
     multiband.calibration = convert(m.calibration);
-    multiband.calibrationencoding = m.calibration_encoding;
+    multiband.calibration_encoding = m.calibration_encoding;
     return multiband;
 }
 
@@ -738,65 +722,38 @@ mrd::EncodingType convert(ISMRMRD::Encoding &e)
 // Convert ISMRMRD::DiffusionDimension to mrd::DiffusionDimension
 mrd::DiffusionDimension convert(ISMRMRD::DiffusionDimension &diffusionDimension)
 {
-    if (diffusionDimension == ISMRMRD::DiffusionDimension::AVERAGE)
+    switch (diffusionDimension)
     {
+    case ISMRMRD::DiffusionDimension::AVERAGE:
         return mrd::DiffusionDimension::kAverage;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::CONTRAST)
-    {
+    case ISMRMRD::DiffusionDimension::CONTRAST:
         return mrd::DiffusionDimension::kContrast;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::PHASE)
-    {
+    case ISMRMRD::DiffusionDimension::PHASE:
         return mrd::DiffusionDimension::kPhase;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::REPETITION)
-    {
+    case ISMRMRD::DiffusionDimension::REPETITION:
         return mrd::DiffusionDimension::kRepetition;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::SET)
-    {
+    case ISMRMRD::DiffusionDimension::SET:
         return mrd::DiffusionDimension::kSet;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::SEGMENT)
-    {
+    case ISMRMRD::DiffusionDimension::SEGMENT:
         return mrd::DiffusionDimension::kSegment;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_0)
-    {
+    case ISMRMRD::DiffusionDimension::USER_0:
         return mrd::DiffusionDimension::kUser0;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_1)
-    {
+    case ISMRMRD::DiffusionDimension::USER_1:
         return mrd::DiffusionDimension::kUser1;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_2)
-    {
+    case ISMRMRD::DiffusionDimension::USER_2:
         return mrd::DiffusionDimension::kUser2;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_3)
-    {
+    case ISMRMRD::DiffusionDimension::USER_3:
         return mrd::DiffusionDimension::kUser3;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_4)
-    {
+    case ISMRMRD::DiffusionDimension::USER_4:
         return mrd::DiffusionDimension::kUser4;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_5)
-    {
+    case ISMRMRD::DiffusionDimension::USER_5:
         return mrd::DiffusionDimension::kUser5;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_6)
-    {
+    case ISMRMRD::DiffusionDimension::USER_6:
         return mrd::DiffusionDimension::kUser6;
-    }
-    else if (diffusionDimension == ISMRMRD::DiffusionDimension::USER_7)
-    {
+    case ISMRMRD::DiffusionDimension::USER_7:
         return mrd::DiffusionDimension::kUser7;
-    }
-    else
-    {
-        throw std::runtime_error("Unknown DiffusionDimension");
+    default:
+        throw std::runtime_error("Unknown diffusion dimension");
     }
 }
 
@@ -852,20 +809,20 @@ mrd::SequenceParametersType convert(ISMRMRD::SequenceParameters &s)
     {
         for (auto &t : *s.flipAngle_deg)
         {
-            sequenceParameters.flip_angledeg.push_back(t);
+            sequenceParameters.flip_angle_deg.push_back(t);
         }
     }
 
     if (s.sequence_type)
     {
-        sequenceParameters.sequencetype = *s.sequence_type;
+        sequenceParameters.sequence_type = *s.sequence_type;
     }
 
     if (s.echo_spacing)
     {
         for (auto &t : *s.echo_spacing)
         {
-            sequenceParameters.echospacing.push_back(t);
+            sequenceParameters.echo_spacing.push_back(t);
         }
     }
 
@@ -930,33 +887,22 @@ mrd::UserParametersType convert(ISMRMRD::UserParameters &u)
 // Convert ISMRMRD::WaveformType to mrd::WaveformType
 mrd::WaveformType convert(ISMRMRD::WaveformType &w)
 {
-    if (w == ISMRMRD::WaveformType::ECG)
+    switch (w)
     {
+    case ISMRMRD::WaveformType::ECG:
         return mrd::WaveformType::kEcg;
-    }
-    else if (w == ISMRMRD::WaveformType::PULSE)
-    {
+    case ISMRMRD::WaveformType::PULSE:
         return mrd::WaveformType::kPulse;
-    }
-    else if (w == ISMRMRD::WaveformType::RESPIRATORY)
-    {
+    case ISMRMRD::WaveformType::RESPIRATORY:
         return mrd::WaveformType::kRespiratory;
-    }
-    else if (w == ISMRMRD::WaveformType::TRIGGER)
-    {
+    case ISMRMRD::WaveformType::TRIGGER:
         return mrd::WaveformType::kTrigger;
-    }
-    else if (w == ISMRMRD::WaveformType::GRADIENTWAVEFORM)
-    {
+    case ISMRMRD::WaveformType::GRADIENTWAVEFORM:
         return mrd::WaveformType::kGradientwaveform;
-    }
-    else if (w == ISMRMRD::WaveformType::OTHER)
-    {
+    case ISMRMRD::WaveformType::OTHER:
         return mrd::WaveformType::kOther;
-    }
-    else
-    {
-        throw std::runtime_error("Unknown WaveformType");
+    default:
+        throw std::runtime_error("Unknown waveform type");
     }
 }
 

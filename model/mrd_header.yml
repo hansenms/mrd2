@@ -7,8 +7,8 @@ PatientGender: !enum
 SubjectInformationType: !record
   fields:
     patientName: string?
-    patientWeightkg: float?
-    patientHeightm: float?
+    patientWeightKg: float?
+    patientHeightM: float?
     patientID: string?
     patientBirthdate: date?
     patientGender: PatientGender?
@@ -94,7 +94,7 @@ MatrixSizeType: !record
     y: uint
     z: uint
 
-FieldOfViewmm: !record
+FieldOfViewMm: !record
   fields:
     x: float
     y: float
@@ -103,7 +103,7 @@ FieldOfViewmm: !record
 EncodingSpaceType: !record
   fields:
     matrixSize: MatrixSizeType
-    fieldOfViewmm: FieldOfViewmm
+    fieldOfViewMm: FieldOfViewMm
 
 LimitType: !record
   fields:
@@ -113,9 +113,9 @@ LimitType: !record
 
 EncodingLimitsType: !record
   fields:
-    kspaceencodingstep0: LimitType?
-    kspaceencodingstep1: LimitType?
-    kspaceencodingstep2: LimitType?
+    kspaceEncodingStep0: LimitType?
+    kspaceEncodingStep1: LimitType?
+    kspaceEncodingStep2: LimitType?
     average: LimitType?
     slice: LimitType?
     contrast: LimitType?
@@ -166,8 +166,8 @@ TrajectoryDescriptionType: !record
 
 AccelerationFactorType: !record
   fields:
-    kspaceencodingstep1: uint
-    kspaceencodingstep2: uint
+    kspaceEncodingStep1: uint
+    kspaceEncodingStep2: uint
 
 CalibrationMode: !enum
     values:
@@ -199,9 +199,9 @@ MultibandType: !record
   fields:
     spacing: MultibandSpacingType*
     deltaKz: float
-    multibandfactor: uint
+    multibandFactor: uint
     calibration: Calibration
-    calibrationencoding: uint64
+    calibrationEncoding: uint64
 
 ParallelImagingType: !record
   fields:
@@ -253,9 +253,9 @@ SequenceParametersType: !record
     tR: float*
     tE: float*
     tI: float*
-    flipAngledeg: float*
-    sequencetype: string?
-    echospacing: float*
+    flipAngleDeg: float*
+    sequenceType: string?
+    echoSpacing: float*
     diffusionDimension: DiffusionDimension?
     diffusion: DiffusionType*
     diffusionScheme: string?

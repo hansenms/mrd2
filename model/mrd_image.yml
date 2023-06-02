@@ -1,5 +1,4 @@
-ImageFlags: !enum
-  base: uint64
+ImageFlags: !flags
   values:
     isNavigationData: 0x1
     firstInAverage: 0x10
@@ -38,7 +37,7 @@ ImageMetaData: !record
 
 Image<T>: !record
   fields:
-    flags: uint64
+    flags: ImageFlags
     measurementUid: uint #Remove?
     fieldOfView: float[3]
     position: float[3]
