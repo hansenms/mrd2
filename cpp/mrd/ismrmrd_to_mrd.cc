@@ -14,6 +14,12 @@ yardl::Date date_from_string(const std::string &s)
     std::stringstream ss{s};
     yardl::Date d;
     ss >> date::parse("%F", d);
+
+    if (ss.fail())
+    {
+        throw std::runtime_error("invalid date format");
+    }
+
     return d;
 }
 
@@ -25,7 +31,7 @@ yardl::Time time_from_string(const std::string &s)
 
     if (ss.fail())
     {
-        throw std::runtime_error("invalid date format");
+        throw std::runtime_error("invalid time format");
     }
 
     return t;
